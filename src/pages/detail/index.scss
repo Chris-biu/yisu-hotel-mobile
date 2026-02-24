@@ -1,0 +1,91 @@
+.detail-page {
+  background-color: #f5f5f5;
+  padding-bottom: 20px;
+}
+
+// 酒店主图
+.hotel-banner {
+  width: 100%;
+  height: auto;
+}
+
+// 基本信息
+.hotel-base-info {
+  padding: 15px;
+  background: #fff;
+  margin-bottom: 10px;
+
+  .hotel-name {
+    font-size: 18px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .hotel-score-address {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+
+    .hotel-score {
+      font-size: 14px;
+      color: #f60;
+      font-weight: 500;
+    }
+
+    .hotel-address {
+      font-size: 14px;
+      color: #666;
+      flex: 1;
+    }
+  }
+
+  .hotel-phone {
+    font-size: 14px;
+    color: #999;
+  }
+}
+
+// 价格栏
+.hotel-price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  background: #fff;
+  margin-bottom: 10px;
+
+  .price-text {
+    font-size: 20px;
+    color: #f60;
+    font-weight: bold;
+  }
+
+  .book-btn {
+    padding: 8px 20px;
+    background: #f60;
+    color: #fff;
+    border-radius: 20px;
+    font-size: 14px;
+  }
+}
+
+// 酒店介绍
+.hotel-intro {
+  padding: 15px;
+  background: #fff;
+
+  .intro-title {
+    font-size: 16px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .intro-content {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+  }
+}

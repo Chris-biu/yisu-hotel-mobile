@@ -95,10 +95,11 @@ export default function HotelIndex() {
           <View 
             key={hotel.id}
             className="hotel-card"
-            onClick={() => Taro.showToast({ 
-              title: '选择了' + hotel.name, // 替换反引号，避免JSX语法问题
-              icon: "none" 
-            })}
+            onClick={() => {
+  Taro.navigateTo({
+    url: `/pages/detail/index?id=${hotel.id}`
+  })
+}}
           >
             <Image 
               src={hotel.img}
