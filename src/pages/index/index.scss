@@ -18,12 +18,16 @@
 
   // 轮播图样式
   .banner {
+  width: 100%;
+  .swiper {
     width: 100%;
-    .banner-img {
-      width: 100%;
-      height: auto;
-    }
+    height: auto;
   }
+  .banner-img {
+    width: 100%;
+    height: auto;
+  }
+}
 
   // 功能入口样式
   .func-grid {
