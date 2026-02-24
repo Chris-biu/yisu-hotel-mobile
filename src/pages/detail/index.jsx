@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro';
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image } from '@tarojs/components';
+import { View, Text, Image, Input, Picker } from '@tarojs/components';
 import './index.scss';
 
 const hotelDetailData = [
@@ -36,8 +36,42 @@ const hotelDetailData = [
   }
 ];
 
-const HotelDetail = () => {
+const getDateOptions = () => {
+  const options = [];
+  const today = new Date();
+  for (let i = 0; i < 30; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    options.push({
+      label: `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
+      value: `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
+    });
+  }
+  return options;
+};
+
+const personOptions = [
+  { label: '1人', value: '1' },
+  { label: '2人', value: '2' },
+  { label: '3人', value: '3' },
+  { label: '4人', value: '4' }
+];
+
+export default function HotelDetail() {
   const [hotelInfo, setHotelInfo] = useState({});
+
+  // 表单状态
+  const [checkInDateIndex, setCheckInDateIndex] = useState(0);
+  const [checkOutDateIndex, setCheckOutDateIndex] = useState(0);
+  const [checkInDate, setCheckInDate] = useState(getDateOptions()[0]?.value);
+  const [checkOutDate, setCheckOutDate] = useState(getDateOptions()[1]?.value);
+  const [personIndex, setPersonIndex] = useState(0);
+  const [personNum, setPersonNum] = useState('1');
+  const [contactName, setContactName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
 
   useEffect(() => {
     const options = Taro.getCurrentInstance().router.params;
@@ -49,6 +83,61 @@ const HotelDetail = () => {
     }
   }, []);
 
+ const handleBook = () => {
+  // 表单验证
+  if (!checkInDate) {
+    Taro.showToast({ title: '请选择入住日期', icon: 'none' });
+    return;
+  }
+  if (!checkOutDate) {
+    Taro.showToast({ title: '请选择离店日期', icon: 'none' });
+    return;
+  }
+  if (new Date(checkInDate) >= new Date(checkOutDate)) {
+    Taro.showToast({ title: '离店日期需晚于入住日期', icon: 'none' });
+    return;
+  }
+  if (!contactName) {
+    Taro.showToast({ title: '请填写联系人', icon: 'none' });
+    return;
+  }
+  if (!/^1[3-9]\d{9}$/.test(contactPhone)) {
+    Taro.showToast({ title: '请填写正确的手机号', icon: 'none' });
+    return;
+  }
+
+  // 计算总价
+  const days = Math.ceil((new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24));
+  const totalPrice = hotelInfo.price * days;
+
+  // 弹出确认弹窗（修复后的代码）
+  Taro.showModal({
+    title: '确认预订',
+    content: `
+      酒店：${hotelInfo.name}
+      入住日期：${checkInDate}
+      离店日期：${checkOutDate}
+      入住人数：${personNum}人
+      联系人：${contactName}
+      手机号：${contactPhone}
+      总价：¥${totalPrice}
+    `,
+    success: (res) => {
+      if (res.confirm) {
+        Taro.showToast({ title: '预订成功！我们会尽快联系您', icon: 'success' });
+        // 重置表单
+        setCheckInDateIndex(0);
+        setCheckOutDateIndex(1);
+        setCheckInDate(getDateOptions()[0]?.value);
+        setCheckOutDate(getDateOptions()[1]?.value);
+        setPersonIndex(0);
+        setPersonNum('1');
+        setContactName('');
+        setContactPhone('');
+      }
+    }
+  });
+};
   return (
     <View className="detail-page">
       <Image 
@@ -56,6 +145,7 @@ const HotelDetail = () => {
         mode="widthFix" 
         className="hotel-banner"
       />
+
       <View className="hotel-base-info">
         <Text className="hotel-name">{hotelInfo.name}</Text>
         <View className="hotel-score-address">
@@ -64,16 +154,111 @@ const HotelDetail = () => {
         </View>
         <Text className="hotel-phone">联系电话：{hotelInfo.phone}</Text>
       </View>
+
       <View className="hotel-price">
         <Text className="price-text">¥{hotelInfo.price}/晚起</Text>
-        <Text className="book-btn">立即预订</Text>
       </View>
+
+      <View className="book-form">
+        <Text className="form-title">立即预订</Text>
+        
+        <View className="form-item">
+          <Text className="form-label">入住日期：</Text>
+          <Picker
+            mode="selector"
+            range={getDateOptions()}
+            rangeKey="label"
+            value={checkInDateIndex}
+            onChange={(e) => {
+              const index = e.detail.value;
+              setCheckInDateIndex(index);
+              setCheckInDate(getDateOptions()[index].value);
+            }}
+          >
+            <View className="picker-input">
+              {getDateOptions()[checkInDateIndex]?.label || '请选择入住日期'}
+            </View>
+          </Picker>
+        </View>
+
+        <View className="form-item">
+          <Text className="form-label">离店日期：</Text>
+          <Picker
+            mode="selector"
+            range={getDateOptions()}
+            rangeKey="label"
+            value={checkOutDateIndex}
+            onChange={(e) => {
+              const index = e.detail.value;
+              setCheckOutDateIndex(index);
+              setCheckOutDate(getDateOptions()[index].value);
+            }}
+          >
+            <View className="picker-input">
+              {getDateOptions()[checkOutDateIndex]?.label || '请选择离店日期'}
+            </View>
+          </Picker>
+        </View>
+
+        <View className="form-item">
+          <Text className="form-label">入住人数：</Text>
+          <Picker
+            mode="selector"
+            range={personOptions}
+            rangeKey="label"
+            value={personIndex}
+            onChange={(e) => {
+              const index = e.detail.value;
+              setPersonIndex(index);
+              setPersonNum(personOptions[index].value);
+            }}
+          >
+            <View className="picker-input">
+              {personOptions[personIndex]?.label || '请选择人数'}
+            </View>
+          </Picker>
+        </View>
+
+        {/* 联系人输入 */}
+<View className="form-item">
+  <Text className="form-label">联系人：</Text>
+  <Input
+    className="input-box"
+    placeholder="请输入联系人姓名"
+    value={contactName}
+    onInput={(e) => {
+      console.log('联系人输入:', e.detail.value); // 调试日志
+      setContactName(e.detail.value);
+    }}
+    onBlur={(e) => setContactName(e.detail.value)} // 兼容失焦更新
+  />
+</View>
+
+{/* 手机号输入 */}
+<View className="form-item">
+  <Text className="form-label">手机号：</Text>
+  <Input
+    className="input-box"
+    placeholder="请输入11位手机号"
+    type="text" // 临时改为 text，避免 number 类型在 H5 端的兼容性问题
+    value={contactPhone}
+    onInput={(e) => {
+      console.log('手机号输入:', e.detail.value); // 调试日志
+      setContactPhone(e.detail.value);
+    }}
+    onBlur={(e) => setContactPhone(e.detail.value)} // 兼容失焦更新
+  />
+</View>
+
+        <View className="submit-btn" onClick={handleBook}>
+          <Text className="btn-text">提交预订</Text>
+        </View>
+      </View>
+
       <View className="hotel-intro">
         <Text className="intro-title">酒店介绍</Text>
         <Text className="intro-content">{hotelInfo.intro}</Text>
       </View>
     </View>
   );
-};
-
-export default HotelDetail;
+}
