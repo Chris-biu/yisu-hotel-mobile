@@ -1,92 +1,179 @@
-// 页面全局样式
 .index-page {
   background-color: #f5f5f5;
   min-height: 100vh;
+}
 
-  // 搜索栏样式
-  .search-bar {
-    background-color: #fff;
-    padding: 20rpx;
-    .search-input {
-      height: 80rpx;
-      background-color: #f5f5f5;
-      border-radius: 40rpx;
-      padding: 0 30rpx;
-      font-size: 28rpx;
-    }
+// 核心查询区域
+.search-box {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #fff;
+  margin: 10px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .location-item {
+    display: flex;
+    align-items: center;
+    margin-right: 12px;
   }
 
-  // 轮播图样式
-  .banner {
-  width: 100%;
-  .swiper {
-    width: 100%;
-    height: auto;
+  .location-icon {
+    font-size: 16px;
+    margin-right: 4px;
   }
-  .banner-img {
-    width: 100%;
-    height: auto;
+
+  .location-text {
+    font-size: 15px;
+    color: #333;
+  }
+
+  .search-input {
+    flex: 1;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 12px;
+    background-color: #f5f5f5;
+    border-radius: 18px;
+    font-size: 14px;
+    color: #333;
   }
 }
 
-  // 功能入口样式
-  .func-grid {
+// 日期选择区域（Picker版本，替换原date-select-box）
+.date-select-bar {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #fff;
+  margin: 10px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .date-item {
+    flex: 1;
+    text-align: center;
+    font-size: 15px;
+    color: #333;
+  }
+
+  .divider {
+    font-size: 14px;
+    color: #e5e5e5;
+    margin: 0 10px;
+  }
+
+  .night-count {
+    font-size: 14px;
+    color: #1890ff;
+    margin-left: 10px;
+  }
+}
+
+// 轮播图
+.banner {
+  margin: 0 16px;
+
+  .banner-swiper {
+    height: auto;
+  }
+
+  .banner-img {
+    width: 100%;
+    border-radius: 8px;
+  }
+}
+
+// 功能入口
+.func-grid {
+  display: flex;
+  justify-content: space-around;
+  background-color: #fff;
+  margin: 10px 16px;
+  padding: 16px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .func-item {
+    text-align: center;
+
+    .func-text {
+      font-size: 15px;
+      color: #333;
+    }
+  }
+}
+
+// 酒店列表
+.hotel-list {
+  margin: 10px 16px;
+
+  .list-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+  }
+
+  .hotel-card {
     display: flex;
+    align-items: center;
     background-color: #fff;
-    margin-top: 20rpx;
-    padding: 30rpx 0;
-    .func-item {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    .hotel-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 4px;
+      margin-right: 12px;
+    }
+
+    .hotel-info {
       flex: 1;
-      text-align: center;
-      .func-text {
-        font-size: 28rpx;
+
+      .hotel-name {
+        font-size: 15px;
         color: #333;
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+
+      .hotel-address {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 4px;
+      }
+
+      .hotel-price {
+        font-size: 14px;
+        color: #f5222d;
+        font-weight: bold;
       }
     }
   }
 
-  // 酒店列表样式
-  .hotel-list {
-    margin-top: 20rpx;
-    padding: 0 20rpx;
-    .list-title {
-      font-size: 32rpx;
-      font-weight: bold;
-      color: #333;
-      margin-bottom: 20rpx;
-      display: block;
-    }
-    .hotel-card {
-      display: flex;
-      background-color: #fff;
-      border-radius: 10rpx;
-      padding: 20rpx;
-      .hotel-img {
-        width: 180rpx;
-        height: 120rpx;
-        border-radius: 8rpx;
-        margin-right: 20rpx;
-      }
-      .hotel-info {
-        flex: 1;
-        .hotel-name {
-          font-size: 30rpx;
-          color: #333;
-          display: block;
-          margin-bottom: 10rpx;
-        }
-        .hotel-address {
-          font-size: 24rpx;
-          color: #999;
-          display: block;
-          margin-bottom: 10rpx;
-        }
-        .hotel-price {
-          font-size: 28rpx;
-          color: #f60;
-          font-weight: bold;
-        }
-      }
-    }
+  .empty-text {
+    text-align: center;
+    font-size: 14px;
+    color: #999;
+    padding: 20px 0;
   }
+}
+// 查询按钮
+.search-btn {
+  margin: 0 16px 10px;
+  padding: 12px;
+  background-color: #1890ff;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+.btn-text {
+  font-size: 16px;
+  color: #fff;
+  font-weight: 500;
 }
