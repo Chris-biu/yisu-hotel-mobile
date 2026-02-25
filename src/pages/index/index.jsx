@@ -221,6 +221,18 @@ export default function HotelIndex() {
           <Text className="empty-text">暂无符合条件的酒店</Text>
         )}
       </View>
+      <View className="func-grid">
+  <View className="func-item" onClick={() => Taro.showToast({ title: '热门城市待开发', icon: 'none' })}>
+    <Text className="func-text">热门城市</Text>
+  </View>
+  <View className="func-item" onClick={() => Taro.showToast({ title: '价格筛选待开发', icon: 'none' })}>
+    <Text className="func-text">价格筛选</Text>
+  </View>
+  <View className="func-item" onClick={() => Taro.showToast({ title: '评分排序待开发', icon: 'none' })}>
+    <Text className="func-text">评分排序</Text>
+  </View>
+</View>
     </View> // 唯一的根容器闭合标签
+    
   );
 }

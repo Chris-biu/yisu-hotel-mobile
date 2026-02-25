@@ -1,0 +1,84 @@
+.hotel-list-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+// 顶部头部
+.header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.back-btn {
+  font-size: 20px;
+  color: #333;
+  margin-right: 12px;
+}
+.query-info {
+  flex: 1;
+  .city {
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .date {
+    font-size: 13px;
+    color: #666;
+  }
+}
+// 列表容器
+.list-container {
+  padding: 10px 16px;
+}
+// 酒店卡片
+.hotel-card {
+  display: flex;
+  background-color: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.hotel-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 4px;
+  margin-right: 12px;
+}
+.hotel-info {
+  flex: 1;
+  .hotel-name {
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .hotel-address {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .bottom-info {
+    display: flex;
+    justify-content: space-between;
+    .score {
+      font-size: 13px;
+      color: #ff9500;
+    }
+    .price {
+      font-size: 15px;
+      color: #f5222d;
+      font-weight: bold;
+    }
+  }
+}
+.empty-text {
+  text-align: center;
+  font-size: 14px;
+  color: #999;
+  padding: 20px 0;
+}
