@@ -1,155 +1,236 @@
 import Taro from '@tarojs/taro';
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Input, Swiper, SwiperItem, Picker } from '@tarojs/components';
+import React, { useState } from 'react';
+import { View, Text, Input, Picker, Image, ScrollView, Swiper, SwiperItem } from '@tarojs/components';
 import './index.scss';
-import { HOTEL_DATA } from '../../utils/hotelData'; 
+// 引入公共酒店数据
+import { HOTEL_DATA } from '../../utils/hotelData';
 
-export default function HotelIndex() {
-  // 状态管理
-  const [currentCity, setCurrentCity] = useState('武汉市');
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [filteredHotels, setFilteredHotels] = useState([]);
+// 城市列表
+const cityOptions = [
+  { label: '武汉', value: '武汉' },
+  { label: '北京', value: '北京' },
+  { label: '上海', value: '上海' },
+  { label: '广州', value: '广州' },
+  { label: '深圳', value: '深圳' }
+];
 
-  // 生成未来30天日期选项
-  const generateDateOptions = () => {
-    const options = [];
-    const today = new Date();
-    for (let i = 0; i < 30; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      const dateStr = d.toISOString().split('T')[0];
-      options.push(dateStr);
-    }
-    return options;
-  };
-  const dateOptions = generateDateOptions();
-  const [checkInIdx, setCheckInIdx] = useState(0);
-  const [checkOutIdx, setCheckOutIdx] = useState(1);
-  const checkInDate = dateOptions[checkInIdx];
-  const checkOutDate = dateOptions[checkOutIdx];
-  const stayNights = checkOutIdx - checkInIdx;
+// 酒店专属轮播图数据（关联酒店ID，点击跳转对应详情页）
+const bannerList = [
+  { 
+    id: 1, 
+    hotelId: 1, // 关联易宿精品酒店
+    img: 'https://placeholder.pics/svg/375x150/F5F5F5/999999/易宿精品酒店-市中心核心商圈' 
+  },
+  { 
+    id: 2, 
+    hotelId: 2, // 关联星辰酒店
+    img: 'https://placeholder.pics/svg/375x150/F5F5F5/999999/星辰酒店-高铁站旁出站即达' 
+  },
+  { 
+    id: 3, 
+    hotelId: 3, // 关联悦居酒店
+    img: 'https://placeholder.pics/svg/375x150/F5F5F5/999999/悦居酒店-景区湖景推窗见景' 
+  }
+];
 
-  // 静态数据
-  const bannerList = [
-    { id: 1, img: "https://placeholder.pics/svg/375x200/F5F5F5/999999/易宿精品酒店", hotelId: 1 },
-    { id: 2, img: "https://placeholder.pics/svg/375x200/F5F5F5/999999/星辰酒店", hotelId: 2 },
-    { id: 3, img: "https://placeholder.pics/svg/375x200/F5F5F5/999999/悦居酒店", hotelId: 3 },
-  ];
- 
-  const hotelList = HOTEL_DATA;
-
-  // 页面初始化
-  useEffect(() => {
-    setFilteredHotels(hotelList);
-    // 模拟定位
-    Taro.getLocation({
-      type: 'gcj02',
-      success: (res) => console.log('定位成功', res),
-      fail: () => Taro.showToast({ title: '定位失败，使用默认城市', icon: 'none' })
+// 日期选择器数据生成
+const getDateOptions = () => {
+  const options = [];
+  const today = new Date();
+  for (let i = 0; i < 30; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    options.push({
+      label: `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`,
+      value: `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
     });
-  }, []);
+  }
+  return options;
+};
 
-  // 搜索筛选逻辑
-  useEffect(() => {
-    if (!searchKeyword) {
-      setFilteredHotels(hotelList);
-    } else {
-      const keyword = searchKeyword.toLowerCase();
-      const result = hotelList.filter(hotel => 
-        hotel.name.toLowerCase().includes(keyword) || hotel.address.toLowerCase().includes(keyword)
-      );
-      setFilteredHotels(result);
+export default function Index() {
+  // 状态管理
+  const [currentCityIndex, setCurrentCityIndex] = useState(0);
+  const [currentCity, setCurrentCity] = useState('武汉');
+  const [checkInDateIndex, setCheckInDateIndex] = useState(0);
+  const [checkInDate, setCheckInDate] = useState(getDateOptions()[0]?.value);
+  const [checkOutDateIndex, setCheckOutDateIndex] = useState(1);
+  const [checkOutDate, setCheckOutDate] = useState(getDateOptions()[1]?.value);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [filteredHotels, setFilteredHotels] = useState(HOTEL_DATA);
+
+  // 城市选择
+  const handleCityChange = (e) => {
+    const index = e.detail.value;
+    setCurrentCityIndex(index);
+    setCurrentCity(cityOptions[index].value);
+  };
+
+  // 入住日期选择
+  const handleCheckInChange = (e) => {
+    const index = e.detail.value;
+    setCheckInDateIndex(index);
+    setCheckInDate(getDateOptions()[index].value);
+  };
+
+  // 离店日期选择
+  const handleCheckOutChange = (e) => {
+    const index = e.detail.value;
+    setCheckOutDateIndex(index);
+    setCheckOutDate(getDateOptions()[index].value);
+  };
+
+  // 搜索酒店
+  const handleSearch = () => {
+    if (!currentCity) {
+      Taro.showToast({ title: '请选择城市', icon: 'none' });
+      return;
     }
-  }, [searchKeyword]);
+    if (!checkInDate || !checkOutDate) {
+      Taro.showToast({ title: '请选择入住/离店日期', icon: 'none' });
+      return;
+    }
+    if (new Date(checkInDate) >= new Date(checkOutDate)) {
+      Taro.showToast({ title: '离店日期需晚于入住日期', icon: 'none' });
+      return;
+    }
 
-  // 页面渲染
+    // 筛选逻辑：关键词匹配（名称/地址）+ 城市匹配
+    let result = HOTEL_DATA.filter(hotel => {
+      const matchCity = hotel.address.includes(currentCity);
+      const matchKeyword = searchKeyword 
+        ? hotel.name.includes(searchKeyword) || hotel.address.includes(searchKeyword)
+        : true;
+      return matchCity && matchKeyword;
+    });
+
+    setFilteredHotels(result);
+
+    // 跳转到酒店列表页，传递参数
+    Taro.navigateTo({
+      url: `/pages/hotelList/index?city=${currentCity}&keyword=${searchKeyword}&checkIn=${checkInDate}&checkOut=${checkOutDate}`
+    });
+  };
+
+  // 新增：轮播图点击跳转对应酒店详情页
+  const handleBannerClick = (hotelId) => {
+    Taro.navigateTo({
+      url: `/pages/detail/index?id=${hotelId}&checkIn=${checkInDate}&checkOut=${checkOutDate}`
+    });
+  };
+
   return (
-    <View className="container">
-      {/* 核心搜索区域：恢复定位显示 + 可输入 */}
-      <View className="search-container">
-        <View className="location-wrap">
-          <Text className="location-icon">📍</Text>
-          <Text className="location-text">{currentCity}</Text>
-        </View>
-        <View className="input-wrapper">
-          <Input
-            className="native-input"
-            placeholder="请输入酒店名/地址搜索"
-            placeholderStyle={{ color: '#999' }}
-            value={searchKeyword}
-            onInput={(e) => setSearchKeyword(e.detail.value)}
-            type="text"
-          />
-        </View>
-      </View>
+    <ScrollView className="index-page" scrollY>
+      {/* 酒店专属轮播图（带跳转功能） */}
+      <Swiper className="banner-swiper" autoplay circular indicatorDots>
+        {bannerList.map(item => (
+          <SwiperItem key={item.id}>
+            <View 
+              className="banner-item"
+              onClick={() => handleBannerClick(item.hotelId)} // 点击跳转对应酒店
+            >
+              <Image 
+                src={item.img} 
+                mode="widthFix" 
+                className="banner-img"
+              />
+            </View>
+          </SwiperItem>
+        ))}
+      </Swiper>
 
-      {/* 日期选择区域 */}
-      <View className="date-select-bar">
-        <Picker range={dateOptions} value={checkInIdx} onChange={(e) => setCheckInIdx(e.detail.value)}>
-          <View className="date-item">{checkInDate || '选择入住日期'}</View>
+      {/* 顶部搜索栏 */}
+      <View className="search-bar">
+        <Picker
+          mode="selector"
+          range={cityOptions}
+          rangeKey="label"
+          value={currentCityIndex}
+          onChange={handleCityChange}
+        >
+          <View className="city-picker">
+            <Text className="city-text">{currentCity}</Text>
+          </View>
         </Picker>
-        <Text className="divider">|</Text>
-        <Picker range={dateOptions} value={checkOutIdx} onChange={(e) => setCheckOutIdx(e.detail.value)}>
-          <View className="date-item">{checkOutDate || '选择离店日期'}</View>
+        
+        <Input
+          className="search-input"
+          placeholder="请输入酒店名称/地址"
+          value={searchKeyword}
+          onInput={(e) => setSearchKeyword(e.detail.value)}
+        />
+        
+        <View className="search-btn" onClick={handleSearch}>
+          <Text className="btn-text">查询</Text>
+        </View>
+      </View>
+
+      {/* 日期选择区 */}
+      <View className="date-selector">
+        <Picker
+          mode="selector"
+          range={getDateOptions()}
+          rangeKey="label"
+          value={checkInDateIndex}
+          onChange={handleCheckInChange}
+        >
+          <View className="date-item">
+            <Text className="date-label">入住</Text>
+            <Text className="date-value">{checkInDate || '请选择'}</Text>
+          </View>
         </Picker>
-        {stayNights > 0 && <Text className="night-count">共 {stayNights} 晚</Text>}
+        
+        <View className="date-split">至</View>
+        
+        <Picker
+          mode="selector"
+          range={getDateOptions()}
+          rangeKey="label"
+          value={checkOutDateIndex}
+          onChange={handleCheckOutChange}
+        >
+          <View className="date-item">
+            <Text className="date-label">离店</Text>
+            <Text className="date-value">{checkOutDate || '请选择'}</Text>
+          </View>
+        </Picker>
       </View>
 
-      {/* 查询按钮 */}
-      <View className="search-btn" onClick={() => {
-        Taro.navigateTo({
-          url: `/pages/hotelList/index?city=${currentCity}&keyword=${searchKeyword}&checkIn=${checkInDate}&checkOut=${checkOutDate}`
-        });
-      }}>
-        <Text className="btn-text">查询酒店</Text>
-      </View>
-
-      {/* 轮播图 */}
-      <View className="banner">
-        <Swiper indicatorDots autoplay circular interval={3000} duration={500}>
-          {bannerList.map(item => (
-            <SwiperItem key={item.id}>
-              <Image src={item.img} mode="widthFix" className="banner-img" onClick={() => {
-                Taro.navigateTo({ url: `/pages/detail/index?id=${item.hotelId}` });
-              }} />
-            </SwiperItem>
-          ))}
-        </Swiper>
-      </View>
-
-      {/* 功能入口 */}
-      <View className="func-grid">
-        <View className="func-item" onClick={() => Taro.showToast({ title: '热门城市待开发', icon: 'none' })}>
-          <Text className="func-text">热门城市</Text>
-        </View>
-        <View className="func-item" onClick={() => Taro.showToast({ title: '价格筛选待开发', icon: 'none' })}>
-          <Text className="func-text">价格筛选</Text>
-        </View>
-        <View className="func-item" onClick={() => Taro.showToast({ title: '评分排序待开发', icon: 'none' })}>
-          <Text className="func-text">评分排序</Text>
-        </View>
-      </View>
-
-      {/* 酒店列表 */}
+      {/* 酒店列表（首页预览） */}
       <View className="hotel-list">
         <Text className="list-title">推荐酒店</Text>
         {filteredHotels.length > 0 ? (
           filteredHotels.map(hotel => (
-            <View key={hotel.id} className="hotel-card" onClick={() => {
-              Taro.navigateTo({ url: `/pages/detail/index?id=${hotel.id}` });
-            }}>
-              <Image src={hotel.img} mode="widthFix" className="hotel-img" />
+            <View 
+              key={hotel.id}
+              className="hotel-card"
+              onClick={() => {
+                Taro.navigateTo({
+                  url: `/pages/detail/index?id=${hotel.id}&checkIn=${checkInDate}&checkOut=${checkOutDate}`
+                });
+              }}
+            >
+              <Image 
+                src={hotel.img}
+                mode="widthFix" 
+                className="hotel-img"
+              />
               <View className="hotel-info">
                 <Text className="hotel-name">{hotel.name}</Text>
                 <Text className="hotel-address">{hotel.address}</Text>
-                <Text className="hotel-price">¥{hotel.price}/晚起</Text>
+                <Text className="hotel-price">
+                  ¥{Math.min(...hotel.rooms.map(r => r.price))}/晚起
+                </Text>
               </View>
             </View>
           ))
         ) : (
-          <Text className="empty-text">暂无符合条件的酒店</Text>
+          <Text className="empty-text">暂无推荐酒店</Text>
         )}
       </View>
-    </View>
+    </ScrollView>
   );
 }

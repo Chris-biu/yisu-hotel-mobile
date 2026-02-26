@@ -126,17 +126,20 @@
   }
 }
 
-// 轮播图
-.banner {
-  margin: 0 16px;
+// banner 轮播图样式
+.banner-swiper {
+  width: 100%;
+  height: auto;
 
-  .banner-swiper {
-    height: auto;
+  .banner-item {
+    width: 100%;
+    height: 100%;
+    cursor: pointer; // 鼠标指针变为手型，提示可点击
   }
 
   .banner-img {
     width: 100%;
-    border-radius: 8px;
+    height: auto;
   }
 }
 

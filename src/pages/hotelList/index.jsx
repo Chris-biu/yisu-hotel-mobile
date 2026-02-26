@@ -2,7 +2,7 @@ import Taro from '@tarojs/taro';
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, View as ScrollView } from '@tarojs/components';
 import './index.scss';
-// 引入公共酒店数据（包含房型）
+// 引入公共酒店数据
 import { HOTEL_DATA } from '../../utils/hotelData';
 
 export default function HotelList() {
@@ -14,15 +14,14 @@ export default function HotelList() {
     checkOut: ''
   });
   
-  // 核心修改：不再用本地静态数据，直接用公共的 HOTEL_DATA
-  // 提取酒店基础信息（列表页只展示基础信息，房型在详情页展示）
+  // 核心：提取酒店基础信息，价格取最低房型价格
   const baseHotelList = HOTEL_DATA.map(hotel => ({
     id: hotel.id,
     name: hotel.name,
     address: hotel.address,
-    // 列表页展示「最低价格」（取第一个房型的价格，也可以取所有房型的最低价）
-    price: hotel.rooms[0].price, 
-    score: Math.random() * 0.5 + 4.5, // 模拟评分（可替换为真实数据）
+    // 关键：取当前酒店所有房型的最低价格
+    price: Math.min(...hotel.rooms.map(r => r.price)),
+    score: Math.random() * 0.5 + 4.5, // 模拟评分
     img: hotel.img
   }));
   
@@ -86,6 +85,7 @@ export default function HotelList() {
                 <Text className="hotel-address">{hotel.address}</Text>
                 <View className="bottom-info">
                   <Text className="score">评分：{hotel.score.toFixed(1)}</Text>
+                  {/* 这里的 price 已经是最低房型价格 */}
                   <Text className="price">¥{hotel.price}/晚起</Text>
                 </View>
               </View>
