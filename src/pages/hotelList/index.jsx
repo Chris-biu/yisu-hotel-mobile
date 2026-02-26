@@ -2,6 +2,8 @@ import Taro from '@tarojs/taro';
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, View as ScrollView } from '@tarojs/components';
 import './index.scss';
+// 引入公共酒店数据（包含房型）
+import { HOTEL_DATA } from '../../utils/hotelData';
 
 export default function HotelList() {
   // 接收首页传递的参数
@@ -11,26 +13,46 @@ export default function HotelList() {
     checkIn: '',
     checkOut: ''
   });
-  // 酒店列表数据（复用首页数据，后续替换为接口请求）
-  const hotelList = [
-    { id: 1, name: "易宿精品酒店（市中心店）", address: "武汉市XX区解放大道88号", price: 228, score: 4.8, img: "https://placeholder.pics/svg/100x100/F5F5F5/999999/易宿精品酒店" },
-    { id: 2, name: "星辰酒店（高铁站店）", address: "武汉市XX区高铁站东路12号", price: 188, score: 4.6, img: "https://placeholder.pics/svg/100x100/F5F5F5/999999/星辰酒店" },
-    { id: 3, name: "悦居酒店（景区店）", address: "武汉市XX区西湖路66号", price: 268, score: 4.9, img: "https://placeholder.pics/svg/100x100/F5F5F5/999999/悦居酒店" }
-  ];
-  const [filteredList, setFilteredList] = useState(hotelList);
+  
+  // 核心修改：不再用本地静态数据，直接用公共的 HOTEL_DATA
+  // 提取酒店基础信息（列表页只展示基础信息，房型在详情页展示）
+  const baseHotelList = HOTEL_DATA.map(hotel => ({
+    id: hotel.id,
+    name: hotel.name,
+    address: hotel.address,
+    // 列表页展示「最低价格」（取第一个房型的价格，也可以取所有房型的最低价）
+    price: hotel.rooms[0].price, 
+    score: Math.random() * 0.5 + 4.5, // 模拟评分（可替换为真实数据）
+    img: hotel.img
+  }));
+  
+  const [filteredList, setFilteredList] = useState(baseHotelList);
 
-  // 页面加载时获取参数
+  // 页面加载时获取参数并筛选酒店
   useEffect(() => {
     const params = Taro.getCurrentInstance().router.params;
     setQueryParams(params);
-    // 根据参数筛选酒店（简单版：关键词匹配）
-    if (params.keyword) {
-      const result = hotelList.filter(hotel => 
-        hotel.name.toLowerCase().includes(params.keyword.toLowerCase()) || 
-        hotel.address.toLowerCase().includes(params.keyword.toLowerCase())
+    
+    // 深拷贝基础列表，避免修改原数据
+    let result = [...baseHotelList];
+    
+    // 1. 按城市筛选（匹配地址中包含城市名）
+    if (params.city) {
+      result = result.filter(hotel => 
+        hotel.address.toLowerCase().includes(params.city.toLowerCase())
       );
-      setFilteredList(result);
     }
+    
+    // 2. 按关键词筛选（名称/地址匹配）
+    if (params.keyword) {
+      const keyword = params.keyword.toLowerCase();
+      result = result.filter(hotel => 
+        hotel.name.toLowerCase().includes(keyword) || 
+        hotel.address.toLowerCase().includes(keyword)
+      );
+    }
+    
+    setFilteredList(result);
   }, []);
 
   return (
@@ -39,8 +61,8 @@ export default function HotelList() {
       <View className="header">
         <Text className="back-btn" onClick={() => Taro.navigateBack()}>←</Text>
         <View className="query-info">
-          <Text className="city">{queryParams.city}</Text>
-          <Text className="date">{queryParams.checkIn} 至 {queryParams.checkOut}</Text>
+          <Text className="city">{queryParams.city || '全部城市'}</Text>
+          <Text className="date">{queryParams.checkIn || '未选择'} 至 {queryParams.checkOut || '未选择'}</Text>
         </View>
       </View>
 
@@ -51,14 +73,19 @@ export default function HotelList() {
             <View 
               key={hotel.id}
               className="hotel-card"
-              onClick={() => Taro.navigateTo({ url: `/pages/detail/index?id=${hotel.id}` })}
+              onClick={() => {
+                // 跳转详情页时，传递完整参数（含日期）
+                Taro.navigateTo({ 
+                  url: `/pages/detail/index?id=${hotel.id}&checkIn=${queryParams.checkIn}&checkOut=${queryParams.checkOut}` 
+                });
+              }}
             >
-              <Image src={hotel.img} className="hotel-img" />
+              <Image src={hotel.img} className="hotel-img" mode="widthFix" />
               <View className="hotel-info">
                 <Text className="hotel-name">{hotel.name}</Text>
                 <Text className="hotel-address">{hotel.address}</Text>
                 <View className="bottom-info">
-                  <Text className="score">评分：{hotel.score}</Text>
+                  <Text className="score">评分：{hotel.score.toFixed(1)}</Text>
                   <Text className="price">¥{hotel.price}/晚起</Text>
                 </View>
               </View>

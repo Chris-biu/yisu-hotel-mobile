@@ -2,6 +2,7 @@ import Taro from '@tarojs/taro';
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Input, Swiper, SwiperItem, Picker } from '@tarojs/components';
 import './index.scss';
+import { HOTEL_DATA } from '../../utils/hotelData'; 
 
 export default function HotelIndex() {
   // 状态管理
@@ -34,12 +35,8 @@ export default function HotelIndex() {
     { id: 2, img: "https://placeholder.pics/svg/375x200/F5F5F5/999999/星辰酒店", hotelId: 2 },
     { id: 3, img: "https://placeholder.pics/svg/375x200/F5F5F5/999999/悦居酒店", hotelId: 3 },
   ];
-
-  const hotelList = [
-    { id: 1, name: "易宿精品酒店（市中心店）", address: "XX市XX区解放大道88号", price: 228, img: "https://placeholder.pics/svg/100x100/F5F5F5/999999/易宿精品酒店" },
-    { id: 2, name: "星辰酒店（高铁站店）", address: "XX市XX区高铁站东路12号", price: 188, img: "https://placeholder.pics/svg/100x100/F5F5F5/999999/星辰酒店" },
-    { id: 3, name: "悦居酒店（景区店）", address: "XX市XX区西湖路66号", price: 268, img: "https://placeholder.pics/svg/100x100/F5F5F5/999999/悦居酒店" },
-  ];
+ 
+  const hotelList = HOTEL_DATA;
 
   // 页面初始化
   useEffect(() => {

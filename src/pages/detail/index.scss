@@ -1,6 +1,15 @@
+// 根容器
 .detail-page {
   background-color: #f5f5f5;
   padding-bottom: 20px;
+}
+
+// 加载中状态
+.loading {
+  text-align: center;
+  padding: 40px 0;
+  font-size: 14px;
+  color: #999;
 }
 
 // 酒店主图
@@ -47,11 +56,85 @@
   }
 }
 
-// 价格栏
+// ===== 新增：房型选择区域（匹配原有样式风格）=====
+.room-select-section {
+  margin: 0 0 10px 0;
+  padding: 15px;
+  background: #fff;
+
+  .section-title {
+    font-size: 16px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .room-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+    cursor: pointer;
+
+    // 选中状态（匹配原有主色调 #f60）
+    &.active {
+      border-color: #f60;
+      background-color: #fff8f0;
+    }
+
+    .room-left {
+      flex: 1;
+
+      .room-type {
+        font-size: 15px;
+        color: #333;
+        font-weight: 500;
+        display: block;
+      }
+
+      .room-desc {
+        font-size: 13px;
+        color: #666;
+        margin-top: 4px;
+      }
+
+      .stock-out {
+        font-size: 12px;
+        color: #f5222d;
+        margin-top: 4px;
+      }
+    }
+
+    .room-right {
+      text-align: right;
+
+      .room-price {
+        font-size: 16px;
+        color: #f60;
+        font-weight: bold;
+        display: block;
+      }
+
+      .room-total {
+        font-size: 12px;
+        color: #999;
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+// 价格栏（优化：显示选中房型价格+总价）
 .hotel-price {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column; // 改为纵向布局，展示更多价格信息
+  align-items: flex-start;
   padding: 15px;
   background: #fff;
   margin-bottom: 10px;
@@ -60,10 +143,16 @@
     font-size: 20px;
     color: #f60;
     font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  .total-price-tip {
+    font-size: 14px;
+    color: #999;
   }
 }
 
-// ===== 新增：预订表单样式 =====
+// 预订表单样式（保留你原有代码，无重复）
 .book-form {
   padding: 15px;
   background: #fff;
@@ -129,7 +218,7 @@
   }
 }
 
-// 酒店介绍
+// 酒店介绍（保留你原有代码）
 .hotel-intro {
   padding: 15px;
   background: #fff;
